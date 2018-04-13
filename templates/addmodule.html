@@ -1,0 +1,39 @@
+{% extends '_base_template.html' %}
+
+{% block content %}
+<div class="container theme-showcase" role="main">
+    <div class="jumbotron">
+        <img src="/static/img/testmaker-logo.png" alt="A Testmaker logo">
+    </div>
+
+    <div class="container">
+
+        <fieldset>
+            <div class="panel panel-primary panel-heading">
+                <legend><h2>Доступні модулі</h2></legend>
+                {% for module in modules %}<br>
+                    <b>Назва модуля:</b> <a href="{{ url_for('new_task', module_url=module.module_url) }}">{{ module.title }} </a><br>
+                {% endfor %}<br>
+            </div>
+        </fieldset>
+
+    <form method="post">
+            <fieldset>
+                <div class="panel panel-primary panel-heading">
+                    <legend><h2>Новий модуль</h2></legend>
+                    <div class="panel-title">Назва модуля</div>
+                    <input type="text" class="panel-body" name="title" value="">
+                    <br>
+                    <div class="panel-title">
+                        <input type="hidden"  name="module_url" value="new" size=65>
+                    </div>
+                    <br>
+                    <br>
+                    <input type="submit" class="btn btn-lg btn-primary" value="Додати">
+                </div>
+            </fieldset>
+        </form>
+        <br>
+    </div>
+</div>
+{% endblock %}

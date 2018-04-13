@@ -1,0 +1,156 @@
+{% extends 'index.html' %}
+
+{% block head %}
+    {{ super() }}
+      <link href="/static/css/dashboard.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/jquery-ui.css">
+    <link rel="stylesheet" href="/static/css/jquery-confirm.css">
+    <link rel="stylesheet" href="/static/css/toastr.min.css">
+{% endblock %}
+
+{% block h1 %}Модулі{% endblock %}
+
+{% block buttons %}
+
+              <div class="btn-group mr-2">
+                  <button class="btn btn-sm btn-outline-secondary" id="add-module">Додати новий модуль</button>
+              </div>
+
+                    {% endblock %}
+
+{% block main %}
+
+    <div id="modulesDiv"></div>
+
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script src="/static/js/jquery-ui.js"></script>
+    <script src="/static/js/jquery-confirm.js"></script>
+    <script src="/static/js/toastr.min.js"></script>
+
+
+
+    <script type="text/javascript">
+
+      $('#add-module').click(function () {
+            $.confirm({
+                title: 'Додати модуль',
+                theme: 'material',
+                content:
+                '<form  id="add-res">'+
+                '<fieldset>'+
+                '<div class="panel panel-primary panel-heading">'+
+                    '<legend><h2>Новий модуль</h2></legend>'+
+                    '<div class="panel-title">Назва модуля</div>'+
+                    '<input type="text" class="panel-body" name="title" value="">'+
+                    '<br>'+
+                    '<div class="panel-title">'+
+                        '<input type="hidden"  name="module_url" value="new" size=65>'+
+                    '</div>'+
+                '</div>'+
+            '</fieldset>'+
+        '</form>',
+                buttons: {
+                    'Додати': {
+
+                        action: function () {
+                        $.ajax({
+                            url: '/add/module',
+                            type: 'POST',
+                            data: $('#add-res').serialize(),
+                            success: function () {
+                                localStorage.setItem('result', 'success');
+                                localStorage.setItem('message', 'Added new Restaurant');
+                                location.reload();
+                            }
+                        });
+                    }
+                    },
+                    'Відмінити': {
+
+                        action: function () {
+                        toastr.info('Create Cancelled');
+                    }}
+                }
+            });
+
+
+
+console.log( 'ser', $('#add-res').serialize() );
+  });
+  </script>
+
+
+
+    <script type="text/javascript">
+
+	$(document).ready(function() {
+
+
+
+
+
+
+        $.ajax({
+			url : '/getModules',
+			type : 'GET',
+            dataType: 'json',
+			success: function(res){
+			    console.log(res);
+
+				var div = $('<div>')
+                    .attr('class', 'table-responsive')
+                    .append($('<table>')
+        .attr('class', 'table table-striped table-sm')
+        .append(
+            $('<thead>')
+                .append(
+                    $('<tr>')
+                        .append(
+                            $('<th>').text('#'),
+                            $('<th>').text('Назва модуля'),
+                            $('<th>').text('Кількість питань')
+                        )
+                ),
+            $('<tbody>')
+
+        )
+                    );
+
+				var tr = $('<tr>');
+
+
+				var module = '';
+
+				var path = window.location.pathname.substring(0, window.location.pathname.length - 1)
+
+				$.each(res,function(index, value){
+					module = $(tr).clone();
+					$(module).append(
+                            $('<td>').text(index+1),
+                            $('<td>')
+                                .append(
+                                    $('<a>').attr('href', path + '/' + value.id).text(value.title)),
+                            $('<td>').text(value.tasks_count)
+                        );
+					$(div).find('tbody').append(module);
+
+				});
+
+				$('#modulesDiv').append(div);
+			},
+			error: function(error){
+				console.log(error);
+			}
+		});
+    });
+
+
+    </script>
+
+
+
+
+{% endblock %}

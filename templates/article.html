@@ -1,0 +1,36 @@
+{% extends '_base_template.html' %}
+
+{% block content %}
+<div class="container">
+    <h2>Article "{{article.title}}" </h2>
+    <div>
+        <form method="post">
+            <fieldset>
+                <div class="panel-primary">
+                    <legend><h2>New comment</h2></legend>
+                    <div class="panel-title">Date: <i> {{date_today}}</i></div>
+                    <div class="panel-title">Comment:</div>
+                    <textarea name="content" cols="40" rows="3"></textarea>
+                    <br>
+                    <br>
+                    <input type="hidden" name="article_id" value="{{article.id}}">
+                    <input type="submit" class="btn btn-lg btn-success" value="Submit">
+                </div>
+            </fieldset>
+        </form>
+        
+        <br>
+        <fieldset>
+        <legend><h2>All comments:</h2></legend>
+            {% for comment in comments %}<br>
+                <b>Date:</b> {{ comment.date_created }}<br>
+                <b>Content:</b><i> {{ comment.content }}</i><br>
+            {% endfor %}<br>
+        </fieldset>
+
+        <form method="get" action="{{url_for('index')}}">
+            <input type="submit" class="btn btn-lg btn-danger" value="Back">
+        </form>
+    </div>
+</div>
+{% endblock %}

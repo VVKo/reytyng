@@ -1,0 +1,113 @@
+{% extends 'index.html' %}
+
+{% block head %}
+    {{ super() }}
+      <link href="/static/css/dashboard.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/jquery-ui.css">
+    <link rel="stylesheet" href="/static/css/jquery-confirm.css">
+    <link rel="stylesheet" href="/static/css/toastr.min.css">
+{% endblock %}
+
+{% block h1 %}Групи{% endblock %}
+
+{% block buttons %}
+
+              <div class="btn-group mr-2">
+                  <button class="btn btn-sm btn-outline-secondary" id="add-group"><span data-feather="user-plus"></span></button>
+              </div>
+
+                    {% endblock %}
+
+{% block main %}
+
+    <div id="groupsDiv"></div>
+
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script src="/static/js/jquery-ui.js"></script>
+    <script src="/static/js/jquery-confirm.js"></script>
+    <script src="/static/js/toastr.min.js"></script>
+    <script src="/static/js/reytyng.js"></script>
+
+<script type="text/javascript">
+
+	$(document).ready(function() {
+
+
+if (localStorage.getItem('result')) {
+            switch (localStorage.getItem('result')) {
+                case 'true' :
+                    toastr.success(localStorage.getItem('message'));
+                    break;
+                case 'false' :
+                    toastr.error(localStorage.getItem('message'));
+                    break;
+            }
+            localStorage.clear();
+        }
+
+
+$.ajax({
+			url : '/groups/get/all',
+			type : 'GET',
+            dataType: 'json',
+			success: function(res){
+				var div = $('<div>')
+                    .attr('class', 'table-responsive')
+                    .append($('<table>')
+        .attr('class', 'table table-striped table-sm')
+        .append(
+            $('<thead>')
+                .append(
+                    $('<tr>')
+                        .append(
+                            $('<th>').text('#'),
+                            $('<th>').text('ПІП'),
+                                $('<th>').text('Група'),
+                            $('<th>').text('Різне')
+                        )
+                ),
+            $('<tbody>')
+
+        )
+                    );
+
+				var tr = $('<tr>');
+
+
+				var module = '';
+
+				var path = window.location.pathname.substring(0, window.location.pathname.length - 1);
+				$.each(res,function(index, value){
+					module = $(tr).clone();
+                    var studId = value.id;
+
+					$(module).append(
+                            $('<td>').text(index+1),
+                            $('<td>').append(
+                                    $('<a>').attr('href', path + '/' + value.id).text(value.group)),
+                            $('<td>').text('група'),
+                            $('<td>').text(':0')
+                        );
+					$(div).find('tbody').append(module);
+
+				});
+
+				$('#groupsDiv').append(div);
+			},
+			error: function(error){
+				console.log(error);
+			}
+		});
+
+
+
+    });
+
+
+    </script>
+
+
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends '_base_template.html' %}
+
+{% block content %}
+<div class="container">
+    <h2>Реєстрація </h2>
+
+    <form action="" method="post">
+        <fieldset>
+                <div class="panel panel-primary panel-heading">
+                    <legend><h2>Новий користувач</h2></legend>
+                    <div class="panel-title">Username
+                    <input type="text" class="panel-body" name="username" value="">
+                        </div>
+                    <br>
+                    <div class="panel-title">Password
+                    <input type="password"  class="panel-body" name="password" value="">
+                        </div>
+                    <br>
+                    <br>
+                    <input type="submit" class="btn btn-lg btn-primary" value="Зареєструвати">
+                </div>
+        </fieldset>
+      </form>
+
+</div>
+{% endblock %}

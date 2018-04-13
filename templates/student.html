@@ -1,0 +1,28 @@
+{% extends 'index.html' %}
+
+{% block head %}
+    {{ super() }}
+      <link href="/static/css/dashboard.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/jquery-ui.css">
+    <link rel="stylesheet" href="/static/css/jquery-confirm.css">
+    <link rel="stylesheet" href="/static/css/toastr.min.css">
+{% endblock %}
+
+{% block h1 %}{{student.last_name}} {{student.first_name}} {{student.middle_name}}{% endblock %}
+
+{% block buttons %}
+{% endblock %}
+
+{% block main %}
+
+    <div id="studentsDiv"></div>
+
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script src="/static/js/jquery-ui.js"></script>
+    <script src="/static/js/jquery-confirm.js"></script>
+    <script src="/static/js/toastr.min.js"></script>
+    <script src="/static/js/reytyng.js"></script>
+{% endblock %}

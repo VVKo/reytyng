@@ -1,0 +1,32 @@
+{% extends 'index.html' %}
+
+{% block head %}
+    {{ super() }}
+      <link href="/static/css/dashboard.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/jquery-ui.css">
+    <link rel="stylesheet" href="/static/css/jquery-confirm.css">
+    <link rel="stylesheet" href="/static/css/toastr.min.css">
+{% endblock %}
+
+{% block h1 %}Кошик {% endblock %}
+
+{% block buttons %}
+
+              <div class="btn-group mr-2">
+                  <button class="btn btn-sm btn-outline-secondary" id="add-module">Переглянути</button>
+              </div>
+
+                    {% endblock %}
+
+{% block main %}
+
+    <div id="modulesDiv"></div>
+
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script src="/static/js/jquery-ui.js"></script>
+    <script src="/static/js/jquery-confirm.js"></script>
+    <script src="/static/js/toastr.min.js"></script>
+{% endblock %}

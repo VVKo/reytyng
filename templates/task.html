@@ -1,0 +1,316 @@
+{% extends 'index.html' %}
+
+{% block head %}
+    {{ super() }}
+      <link href="/static/css/dashboard.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/jquery-ui.css">
+    <link rel="stylesheet" href="/static/css/jquery-confirm.css">
+    <link rel="stylesheet" href="/static/css/toastr.min.css">
+{% endblock %}
+
+{% block h1 %}Модуль "{{module.title}}"{% endblock %}
+
+{% block buttons %}
+
+              <div class="btn-group mr-2">
+                  <button class="btn btn-sm btn-outline-secondary" id="back-to-modules">До модулів</button>
+                  <button class="btn btn-sm btn-outline-secondary" id="add-task">Додати нове завдання</button>
+              </div>
+
+                    {% endblock %}
+
+{% block main %}
+
+     <div id="tasksDiv"></div>
+
+{% endblock %}
+
+
+
+
+
+
+
+
+{% block scripts %}
+    {{ super() }}
+    <script src="/static/js/jquery-ui.js"></script>
+    <script src="/static/js/jquery-confirm.js"></script>
+    <script src="/static/js/toastr.min.js"></script>
+
+
+
+    <script type="text/javascript">
+
+      $('#add-task').click(function () {
+            $.confirm({
+                title: 'Додати завдання',
+                theme: 'material',
+                content:
+                '<form id="add-resource">'+
+                '<fieldset>'+
+                '<div class="panel-primary">'+
+                    '<div class="panel-title">Завдання :</div>'+
+                    '<textarea name="content" cols="25" rows="5"></textarea>'+
+                    '<br>'+
+                    '<input type="hidden" name="module_id" value="{{ module.id }}">'+
+                    '<input type="hidden"  name="task_url" value="new" size=65>'+
+                    '<input type="radio" name="answer_type" value="choice"> вибір<br>'+
+                    '<input type="radio" name="answer_type" value="match"> відповідність<br>'+
+                    '<br>'+
+                '</div>'+
+            '</fieldset>'+
+        '</form>',
+                buttons: {
+                    'Додати': {
+
+                        action: function () {
+                        $.ajax({
+                            url: '/add/task',
+                            type: 'POST',
+                            data: $('#add-resource').serialize(),
+                            success: function (response) {
+                                localStorage.setItem('result', response.success);
+                                if(response.success){
+                                    localStorage.setItem('message', 'Додано нове завдання');
+                                    location.reload();
+                                }
+                                else{
+                                    localStorage.setItem('message', 'Пробеми з валідацією');
+                                    location.reload();
+                                }
+
+
+                            }
+                        });
+                    }
+                    },
+                    'Відмінити': {
+
+                        action: function () {
+                        toastr.info('Додавання нового завдання відмінено!');
+                    }}
+                }
+            });
+
+
+
+console.log( 'ser', $('#add-res').serialize() );
+  });
+  </script>
+
+
+
+    <script type="text/javascript">
+
+	$(document).ready(function() {
+
+if (localStorage.getItem('result')) {
+            switch (localStorage.getItem('result')) {
+                case 'true' :
+                    toastr.success(localStorage.getItem('message'));
+                    break;
+                case 'false' :
+                    toastr.error(localStorage.getItem('message'));
+                    break;
+            }
+            localStorage.clear();
+        }
+
+
+
+
+        $.ajax({
+			url : '/get/module/{{ module.id }}',
+			type : 'GET',
+            dataType: 'json',
+			success: function(res){
+			    console.log('res =', res);
+
+				var div = $('<div>')
+                    .attr('class', 'table-responsive')
+                    .append($('<table>')
+        .attr('class', 'table table-striped table-sm')
+        .append(
+            $('<thead>')
+                .append(
+                    $('<tr>')
+                        .append(
+                            $('<th>').text('#'),
+                            $('<th>').text('завдання'),
+                            $('<th>').text('кількість питань'),
+                            $('<th>').text('вибір'),
+                            $('<th>').text('відповідність'),
+                            $('<th>').text('Різне')
+                        )
+                ),
+            $('<tbody>')
+
+        )
+                    );
+
+				var tr = $('<tr>');
+
+
+				var module = '';
+
+				var path = window.location.pathname;
+
+				$.each(res,function(index, value){
+					module = $(tr).clone();
+                    if(value.answer_type == 'choice'){
+                        var type1='+';
+                        var type2='-';
+                    }
+                    else{
+                        var type1='-';
+                        var type2='+';
+                    }
+                    var ansId = value.id;
+					$(module).append(
+                            $('<td>').text(index+1),
+                            $('<td>')
+                                .append(
+                                    $('<a>').attr('href', path + '/' + value.id).text(value.content)),
+                        $('<td>').text(res.length),
+                        $('<td>').text(type1),
+                        $('<td>').text(type2),
+                        $('<td>').append($('<button>').attr('data-feather', 'trash').attr('data-task-id',ansId).attr('class', 'delete-task'),
+                            $('<button>').attr('data-feather', 'edit').attr('data-task-id',ansId).attr('class', 'edit-task'),
+                            $('<button>').attr('data-feather', 'shopping-cart').attr('data-task-id',ansId).attr('class', 'shopping-task'))
+
+
+
+                        );
+					$(div).find('tbody').append(module);
+
+				});
+
+				$('#tasksDiv').append(div);
+				feather.replace()
+			},
+			error: function(error){
+				console.log(error);
+			}
+		});
+    });
+
+    $('#back-to-modules').on('click', function () {
+        location.href = "{{ url_for('modules') }}";
+    });
+
+
+
+
+    $('#tasksDiv').on('click','.delete-task', function () {
+        var task = $(this).attr('data-task-id');
+            $.confirm({
+                title: 'Видалення завдання',
+                content: 'Ви впевнені, що хочете видалити завдання? Це видилть усі питиння до нього ',
+                theme: 'material',
+                buttons: {
+                'Видалити': {
+                    action: function () {
+                    $.ajax({
+                        url: '/tasks/'+task+'/delete/',
+                        type: 'POST',
+                        success: function (response) {
+                            localStorage.setItem('result', response.success);
+                                if(response.success){
+                                    localStorage.setItem('message', 'Завдання видалено успішно');
+                                    location.reload();
+                                }
+                                else{
+                                    localStorage.setItem('message', 'Пробеми з видаленням');
+                                    location.reload();
+                                }
+                        }
+                    });
+                }},
+                'Відхилити':{
+                    action: function () {
+                        toastr.info('Delete Cancelled');
+                    }
+                }
+
+            }
+            })
+    });
+
+
+    $('#tasksDiv').on('click','.edit-task', function () {
+        var task = $(this).attr('data-task-id');
+            $.confirm({
+                title: 'Редагування завдання',
+                content: function () {
+                    var self = this;
+                    this.$body.append('<div id="content-edit"></div>');
+                    return $.ajax({
+                        url: '/task/'+task+'/get',
+                        method: 'get',
+                    }).done(function (response) {
+                        function checkMatch(d) {
+                            if( d=='match') return 'checked';
+                        }
+                        function checkChoice(d) {
+                            if( d=='choice') return 'checked';
+                        }
+                        self.setContent('<form id="add-resource">'+
+                '<fieldset>'+
+                '<div class="panel-primary">'+
+                    '<div class="panel-title">Завдання :</div>'+
+                    '<textarea name="content" cols="25" rows="5">'+response.task.content+'</textarea>'+
+                    '<br>'+
+                    '<input type="hidden" name="module_id" value="{{ module.id }}">'+
+                    '<input type="hidden"  name="task_url" value="new" size=65>'+
+                    '<input type="radio" name="answer_type" value="choice"'+checkChoice(response.task.answer_type)+'> вибір<br>'+
+                    '<input type="radio" name="answer_type" value="match"'+checkMatch(response.task.answer_type)+'> відповідність<br>'+
+                    '<br>'+
+                '</div>'+
+            '</fieldset>'+
+        '</form>');
+
+                    }).fail(function (response) {
+                        console.log(response);
+                        self.setContent('Something went wrong.');
+                    });
+                },
+                theme: 'material',
+                buttons: {
+                'Редагувати': {
+                    action: function () {
+                        $.ajax({
+                            url: '/task/'+task+'/update',
+                            type: 'POST',
+                            data: $('#add-resource').serialize(),
+                            success: function (data, response) {
+                                localStorage.setItem('result', response.success);
+                                if (response.success) {
+                                    localStorage.setItem('message', 'Завдання успішно оновлено');
+                                    location.reload();
+                                }
+                                else {
+                                    localStorage.setItem('message', 'Пробеми з валідацією');
+                                    location.reload();
+                                }
+
+
+                            }
+                        })
+                    }},
+                'Відхилити':{
+                    action: function () {
+                        toastr.info('Редагування відмінено');
+                    }
+                }
+
+            }
+            })
+    });
+
+    </script>
+
+
+
+
+{% endblock %}
